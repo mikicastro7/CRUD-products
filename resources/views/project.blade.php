@@ -42,8 +42,8 @@
                         <td>{{$product->created_at}}</td>
                         <td>{{$product->updated_at}}</td>
                         <td>
-                            <button type="button" class="btn btn-warning"><i class="fas fa-trash"></i></button>
-                            <button type="button" class="btn btn-danger"><i class="fas fa-edit"></i></button>
+                            <button type="button" class="btn btn-danger"><i class="fas fa-trash"></i></button>
+                            <button type="button" class="btn btn-warning"><i class="fas fa-edit"></i></button>
                         </td>
                     </tr>
                 @endforeach
