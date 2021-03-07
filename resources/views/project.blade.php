@@ -61,7 +61,7 @@
         const price = $('#price').val();
         $.ajax({
                 method: "POST",
-                url: "/post_product",
+                url: "/",
                 data: {
                     "_token": $("meta[name='csrf-token']").attr("content"),
                     name,
@@ -75,14 +75,13 @@
                 }
                 toastr.error(errors);
             }).done(function (response) {
-                console.log(response);
                 toastr.success(response.message)
                 const addRow = $("<tr></tr>");
                 const formatedObject = {
                     id : response.product.id,
                     name : response.product.name,
                     description : response.product.description === null ? "" : response.product.description,
-                    price : response.product.price,
+                    price : parseInt(response.product.price).toFixed(4),
                     created_at : response.product.created_at.split("T").join(" ").slice(0,19),
                     updated_at : response.product.updated_at.split("T").join(" ").slice(0,19)
                 }
