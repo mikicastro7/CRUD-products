@@ -31,7 +31,7 @@ class ProductController extends Controller
         $product->save();
         return response()->json([
             'status' => 'Success',
-            'message'    => 'Product Added Succesfully',
+            'message'    => 'Product added successfully',
             'product' => $product
         ], 200);
     }
