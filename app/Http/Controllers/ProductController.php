@@ -43,4 +43,23 @@ class ProductController extends Controller
         ], 200);
     }
 
+    public function update(Request $request){
+        $rules = [
+            'price' => 'required|regex:/^\d*(\.\d{1,4})?$/',
+            'name' => 'required|max:100'
+        ];
+        $this->validate($request, $rules);
+        $product = Product::find($request->id);
+        $product->name = $request->name;
+        $product->description = $request->description;
+        $product->price = $request->price;
+
+        $product->save();
+        return response()->json([
+            'status' => 'Success',
+            'message'    => 'Product edited successfully',
+            'product' => $product
+        ], 200);
+    }
+
 }

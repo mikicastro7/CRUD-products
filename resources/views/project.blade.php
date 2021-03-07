@@ -79,7 +79,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="button" class="edit-product-button btn btn-primary">Save changes</button>
+                        <button type="button" class="edit-product-btn btn btn-primary">Save changes</button>
                     </div>
                     </div>
                 </div>
@@ -89,7 +89,51 @@
 </body>
 
 <script>
+    let productId = 0;
 
+    $('.edit-product-btn').on('click', function(e){
+        const name = $('#name-modal').val();
+        const description = $('#description-modal').val();
+        const price = $('#price-modal').val();
+
+        $.ajax({
+            method: "PUT",
+            url: "/product_edit/" + productId,
+            data: {
+                "_token": $("meta[name='csrf-token']").attr("content"),
+                name,
+                description,
+                price
+            }
+        }).fail(function (response){
+            let errors = "";
+            for (const key in response.responseJSON.errors) {
+                errors += response.responseJSON.errors[key] + " ";
+            };
+            toastr.error(errors);
+        }).done(function (response){
+            toastr.success(response.message);
+            $("#editModal").modal('hide');
+
+            const formatedObject = formatObject(response.product)
+            $("table #" + productId).children().eq(1).text(response.product.name);
+            $("table #" + productId).children().eq(2).text(response.product.description);
+            $("table #" + productId).children().eq(3).text(parseInt(response.product.price).toFixed(4));
+            $("table #" + productId).children().eq(5).text(response.product.updated_at.split("T").join(" ").slice(0,19));
+        })
+    })
+
+    const formatObject = function(productObject){
+        const objectFormated = {
+            id : productObject.id,
+            name : productObject.name,
+            description : productObject.description === null ? "" : productObject.description,
+            price : parseInt(productObject.price).toFixed(4),
+            created_at : productObject.created_at.split("T").join(" ").slice(0,19),
+            updated_at : productObject.updated_at.split("T").join(" ").slice(0,19)
+        }
+        return objectFormated;
+    }
 
     $('.delete-btn').on('click', function(e){
         let productId = $(this).parent().parent().get(0).id;
@@ -156,6 +200,7 @@
     });
 
     $('table').delegate('.edit-btn', 'click', function(e){
+        productId = $(this).parent().parent().get(0).id
         const name = $(this).parent().siblings().eq(1).text();
         const description = $(this).parent().siblings().eq(2).text();
         const price =  $(this).parent().siblings().eq(3).text();
