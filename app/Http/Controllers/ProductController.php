@@ -32,4 +32,15 @@ class ProductController extends Controller
             'product' => $product
         ], 200);
     }
+
+    function destroy(Request $request){
+        $product = Product::find($request->id);
+        $product->delete();
+
+        return response()->json([
+            'status' => 'Success',
+            'message'    => 'Product deleted',
+        ], 200);
+    }
+
 }

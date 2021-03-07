@@ -34,7 +34,7 @@
             </thead>
             <tbody>
                 @foreach ($products as $product)
-                    <tr>
+                    <tr id={{$product->id}}>
                         <td>{{$product->id}}</td>
                         <td>{{$product->name}}</td>
                         <td>{{$product->description}}</td>
@@ -42,7 +42,7 @@
                         <td>{{$product->created_at}}</td>
                         <td>{{$product->updated_at}}</td>
                         <td>
-                            <button type="button" class="btn btn-danger"><i class="fas fa-trash"></i></button>
+                            <button type="button" class="delete-btn btn btn-danger"><i class="fas fa-trash"></i></button>
                             <button type="button" class="btn btn-warning"><i class="fas fa-edit"></i></button>
                         </td>
                     </tr>
@@ -54,46 +54,67 @@
 </body>
 
 <script>
+    $('.delete-btn').on('click', function(e){
+        let productId = $(this).parent().parent().get(0).id;
+
+        $.ajax({
+            method: "DELETE",
+            url: "/product_delete/" + productId,
+            data: {
+                "_token": $("meta[name='csrf-token']").attr("content"),
+            }
+        }).fail(function (response){
+            let errors = "";
+            for (const key in response.responseJSON.errors) {
+                errors += response.responseJSON.errors[key] + " ";
+            }
+            toastr.error(errors);
+        }).done(function (response){
+            toastr.success(response.message);
+            $(".table #" + productId).remove();
+        })
+    });
+
     $("#add-product button").on("click", function (e) {
         e.preventDefault();
         const name = $('#name').val();
         const description = $('#description').val();
         const price = $('#price').val();
         $.ajax({
-                method: "POST",
-                url: "/",
-                data: {
-                    "_token": $("meta[name='csrf-token']").attr("content"),
-                    name,
-                    description,
-                    price
-                }
-            }).fail(function (response){
-                let errors = "";
-                for (const key in response.responseJSON.errors) {
-                    errors += response.responseJSON.errors[key] + " "
-                }
-                toastr.error(errors);
-            }).done(function (response) {
-                toastr.success(response.message)
-                const addRow = $("<tr></tr>");
-                const formatedObject = {
-                    id : response.product.id,
-                    name : response.product.name,
-                    description : response.product.description === null ? "" : response.product.description,
-                    price : parseInt(response.product.price).toFixed(4),
-                    created_at : response.product.created_at.split("T").join(" ").slice(0,19),
-                    updated_at : response.product.updated_at.split("T").join(" ").slice(0,19)
-                }
-                for (const key in formatedObject) {
-                    addRow.append("<td>" + formatedObject[key] + "</td>");
-                }
-                addRow.append('<td><button type="button" class="btn btn-warning"><i class="fas fa-trash"></i></button><button type="button" class="btn btn-danger"><i class="fas fa-edit"></i></button></td>')
-                $("tbody").append(addRow);
+            method: "POST",
+            url: "/",
+            data: {
+                "_token": $("meta[name='csrf-token']").attr("content"),
+                name,
+                description,
+                price
+            }
+        }).fail(function (response){
+            let errors = "";
+            for (const key in response.responseJSON.errors) {
+                errors += response.responseJSON.errors[key] + " ";
+            };
+            toastr.error(errors);
+        }).done(function (response) {
+            toastr.success(response.message);
+            const addRow = $("<tr id=" + response.product.id + "></tr>");
+            const formatedObject = {
+                id : response.product.id,
+                name : response.product.name,
+                description : response.product.description === null ? "" : response.product.description,
+                price : parseInt(response.product.price).toFixed(4),
+                created_at : response.product.created_at.split("T").join(" ").slice(0,19),
+                updated_at : response.product.updated_at.split("T").join(" ").slice(0,19)
+            }
+            for (const key in formatedObject) {
+                addRow.append("<td>" + formatedObject[key] + "</td>");
+            }
+            addRow.append('<td><button type="button" class="delete-btn btn btn-danger"><i class="fas fa-trash"></i></button> <button type="button" class="btn btn-warning"><i class="fas fa-edit"></i></button></td>');
+            $("tbody").append(addRow);
 
-                $('#name').val("");
-                $('#description').val("");
-                $('#price').val("");
-            })
+            $('#name').val("");
+            $('#description').val("");
+            $('#price').val("");
+        })
     });
 </script>
