@@ -15,8 +15,8 @@ class CreateProductsTable extends Migration
     {
         Schema::create('product', function (Blueprint $table) {
             $table->id();
-            $table->timestamp('created_at')->useCurrent()->nullable(false);
-            $table->timestamp('updated_at')->useCurrent()->nullable(false);
+            $table->dateTime('created_at', $precision = 0)->nullable(false);
+            $table->dateTime('updated_at', $precision = 0)->nullable(false);
             $table->string('name', 100)->nullable(false);
             $table->text('description')->nullable();
             $table->decimal('price', $precision = 10, $scale = 4)->nullable(false);
