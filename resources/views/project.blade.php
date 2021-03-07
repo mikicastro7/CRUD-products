@@ -3,7 +3,7 @@
     <div class="container">
         <h1 class="text-center p-3">Products project</h1>
         <main>
-            <form action="post">
+            <form id="add-product">
                 <div class="form-row">
                     <div class="form-group col-md-6">
                         <label for="name">Name</label>
@@ -54,4 +54,47 @@
 </body>
 
 <script>
+    $("#add-product button").on("click", function (e) {
+        e.preventDefault();
+        const name = $('#name').val();
+        const description = $('#description').val();
+        const price = $('#price').val();
+        $.ajax({
+                method: "POST",
+                url: "/post_product",
+                data: {
+                    "_token": $("meta[name='csrf-token']").attr("content"),
+                    name,
+                    description,
+                    price
+                }
+            }).fail(function (response){
+                let errors = "";
+                for (const key in response.responseJSON.errors) {
+                    errors += response.responseJSON.errors[key] + " "
+                }
+                toastr.error(errors);
+            }).done(function (response) {
+                console.log(response);
+                toastr.success(response.message)
+                const addRow = $("<tr></tr>");
+                const formatedObject = {
+                    id : response.product.id,
+                    name : response.product.name,
+                    description : response.product.description === null ? "" : response.product.description,
+                    price : response.product.price,
+                    created_at : response.product.created_at.split("T").join(" ").slice(0,19),
+                    updated_at : response.product.updated_at.split("T").join(" ").slice(0,19)
+                }
+                for (const key in formatedObject) {
+                    addRow.append("<td>" + formatedObject[key] + "</td>");
+                }
+                addRow.append('<td><button type="button" class="btn btn-warning"><i class="fas fa-trash"></i></button><button type="button" class="btn btn-danger"><i class="fas fa-edit"></i></button></td>')
+                $("tbody").append(addRow);
+
+                $('#name').val("");
+                $('#description').val("");
+                $('#price').val("");
+            })
+    });
 </script>

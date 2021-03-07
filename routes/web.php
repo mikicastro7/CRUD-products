@@ -14,3 +14,4 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', 'App\Http\Controllers\ProductController@products');
+Route::post('/post_product', 'App\Http\Controllers\ProductController@postProduct');
