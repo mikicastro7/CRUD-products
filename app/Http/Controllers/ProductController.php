@@ -8,15 +8,12 @@ use Illuminate\Support\Facades\Log;
 
 class ProductController extends Controller
 {
-    function products(){
+    function index(){
         $products = Product::all();
         return view('project')->with(array('products' => $products));
     }
 
-    function postProduct(Request $request){
-
-        Log::debug($request);
-
+    function store(Request $request){
         $rules = [
             'price' => 'required|regex:/^\d*(\.\d{1,4})?$/',
             'name' => 'required|max:100'
